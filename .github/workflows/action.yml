@@ -1,0 +1,48 @@
+name: kebernetes-go-api
+run-name: ${{ github.actor }} is learning GitHub Actions
+
+on: [push]
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/api-${{ secrets.NIM }}:latest
+
+          
+
+  deploy_to_kubernetes:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: push_to_registry
+    steps:
+      - name: Deploy using curl
+        uses: indiesdev/curl@v1.1
+        with:
+          url: 'http://154.26.139.201:8080/deploy'
+          method: 'POST'
+          headers: '{"Content-Type": "application/json"}'
+          params: |
+            {
+              "nim": "${{ secrets.NIM }}",
+              "nama": "${{ secrets.NAMA }}",
+              "docker_username": "${{ secrets.DOCKER_USERNAME }}"
+            }
+          accept: 200
+          log-response: true

@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: Kube Deployment Documentation
+  description: Development documentation
+  version: 0.0.1
+servers:
+  - url: http://154.26.139.201:8080
+paths:
+  /:
+    get:
+      operationId: getIndex
+      responses:
+        '200':
+          description: "Return value"
+  /deploy:
+    post:
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: nim
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: nama
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: docker_username
+          required: true
+      operationId: postDeploy
+      responses:
+        '200': 
+          description: "Return value"
+  /clean/{nim}:
+    delete:
+      operationId: deleteCleanByNim
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: nim
+          required: true
+      responses:
+        '200': 
+          description: "Return value"
+components:
+  schemas: {}
